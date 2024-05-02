@@ -21,22 +21,13 @@ The application is deployed on Vercel, and it uses a PostgreSQL database to stor
 - PostgreSQL
 - Vercel (for deployment)
 
-## Getting Started
 
-To run the application locally, follow these steps:
-
-1. Clone the repository: `git clone https://github.com/your-repo/next-demo-dashboard.git`
-2. Install dependencies: `npm install`
-3. Set up the PostgreSQL database and update the configuration in `lib/db.js`
-4. Start the development server: `npm run dev`
-
-The application should now be running at `http://localhost:3000`.
 
 ## Deployment
 
 This application is deployed on Vercel, a platform for static and Jamstack websites and web applications that fits perfectly with Next.js. The deployment process is seamless and automatic, triggered by pushing changes to the connected GitHub repository.
 
-You can access the live demo at: [https://your-vercel-deployment-url.vercel.app](https://your-vercel-deployment-url.vercel.app)
+You can access the live demo at: (https://dashboard-aknokhwals-projects.vercel.app/)
 
 ## Contributing
 
