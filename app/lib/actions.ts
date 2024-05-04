@@ -4,23 +4,50 @@ import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { error } from 'console';
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
 const FromSchema = z.object ({
     id: z.string(),
-    customerId: z.string(),
-    amount: z.coerce.number(),
-    status: z.enum(['pending', 'paid']),
+    customerId: z.string({
+        invalid_type_error: 'Please select a customer'
+    }),
+    amount: z.coerce
+    .number()
+    .gt(0, { message: 'Please enter an amount greater than $0.' })
+    ,
+    status: z.enum(['pending', 'paid'], {
+        invalid_type_error: 'Please select an invoice status.'
+    }),
     data: z.string(),
 })
 
 const CreateInvoice = FromSchema.omit({id: true, data: true})
 
-export async function createInvoice(formData: FormData) {
-    const { customerId, amount, status } = CreateInvoice.parse({
+export type State = {
+    errors?: {
+        customerId?: string[];
+        amount?: string[];
+        status?: string[];
+    };
+    message?: string | null;
+}
+export async function createInvoice(prevState: State, formData: FormData) {
+    const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
         status: formData.get('status'),
     });
+
+    if(!validatedFields.success){
+        return {
+            error: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Field. Failed to Create Invoice.',
+        }
+    }
+    
+    const { customerId, amount, status } = validatedFields.data;
     const amountInCents = amount * 100;
     const date = new Date().toISOString().split('T')[0];
 
@@ -65,8 +92,7 @@ export async function updateInvoice(id: string, formData: FormData) {
   }
 
 
-  export async function deleteInvoice(id: string) {
-    throw new Error('sa');
+export async function deleteInvoice(id: string) {
 
     try {
       await sql`DELETE FROM invoices WHERE id = ${id}`;
@@ -75,4 +101,23 @@ export async function updateInvoice(id: string, formData: FormData) {
     } catch (error) {
       return { message: 'Database Error: Failed to Delete Invoice.' };
     }
-  }
+}
+
+export async function authenticate (
+    prevState: string | undefined,
+    formData: FormData,
+) {
+    try{
+        await signIn('credentials', formData);
+    } catch (error) {
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return 'Invalid credentials.';
+                default:
+                    return 'Something went wrong.';
+            }
+        }
+        throw error;
+    }
+}
