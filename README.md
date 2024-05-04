@@ -28,9 +28,9 @@ The application is deployed on Vercel, and it uses a PostgreSQL database to stor
 This application is deployed on Vercel, a platform for static and Jamstack websites and web applications that fits perfectly with Next.js. The deployment process is seamless and automatic, triggered by pushing changes to the connected GitHub repository.
 
 You can access the live demo at: (https://dashboard-phi-nine-92.vercel.app/)
-Click on Login
-Email: user@nextmail.com
-Password: 123456
+
+  Email: user@nextmail.com
+  Password: 123456
 
 ## Contributing
 
